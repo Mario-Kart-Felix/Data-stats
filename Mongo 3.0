@@ -1,0 +1,59 @@
+collection in MongoDB is the same as a table in MySQL
+
+Creating a Collection
+To create a collection in MongoDB, use the createCollection() method:
+
+Example
+Create a collection called "customers":
+
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("mydb");
+  dbo.createCollection("customers", function(err, res) {
+    if (err) throw err;
+    console.log("Collection created!");
+    db.close();
+  });
+});
+Save the code above in a file called "demo_mongodb_createcollection.js" and run the file:
+
+Run "demo_mongodb_createcollection.js"
+
+C:\Users\Your Name>node demo_mongodb_createcollection.js
+Which will give you this result:
+
+Collection created!
+Important: In MongoDB, a collection is not created until it gets content!
+
+MongoDB waits until you have inserted a document before it actually creates the collection.
+native NodeJS driver:
+(This is applicable to people with "mongodb": "^3.0.0-rc0", or a later version in package.json, that want to keep using the latest version.)
+
+
+In version 2.x of the MongoDB native NodeJS driver you would get the database object as an argument to the connect callback:
+
+MongoClient.connect('mongodb://localhost:27017/mytestingdb', (err, db) => {
+  // Database returned
+});
+According to the changelog for 3.0 you now get a client object containing the database object instead:
+
+MongoClient.connect('mongodb://localhost:27017', (err, client) => {
+  // Client returned
+  var db = client.db('mytestingdb');
+});
+The close() method has also been moved to the client. The code in the question can therefore be translated to:
+
+MongoClient.connect('mongodb://localhost', function (err, client) {
+  if (err) throw err;
+
+  var db = client.db('mytestingdb');
+
+  db.collection('customers').findOne({}, function (findErr, result) {
+    if (findErr) throw findErr;
+    console.log(result.name);
+    client.close();
+  });
+}); 
